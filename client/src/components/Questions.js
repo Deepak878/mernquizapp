@@ -1,43 +1,62 @@
 import React, { useEffect, useState } from "react";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 //Custom Hook
 import { useFetchQuestion } from "../hooks/FetchQuestion";
-const Questions = () => {
+import { updateResult } from "../hooks/setResult";
+const Questions = ({onChecked}) => {
   const [checked, setChecked] = useState(undefined);
-  const [{isLoading, apiData, serverError}] = useFetchQuestion()
+  const {trace} = useSelector(state=>state.questions)
+  const state = useSelector(state=>state)
+  console.log(state);
 
-  const questions = useSelector(state=>state.questions.queue[state.questions.trace] )
-
-  useEffect(()=>{
-    console.log(questions);
-    // console.log(state);
-  })
-   
+  const result = useSelector(state=>state.result.result)
+  const [{ isLoading, apiData, serverError }] = useFetchQuestion()
+  const questions = useSelector(
+    (state) => state.questions.queue[state.questions.trace]
+  );
+  const dispatch = useDispatch()
   useEffect(() => {
-    // console.log(isLoading);
-    // console.log("apidata",apiData);
-    // console.log(serverError);
-  });
-   const onSelect = () => {
-    //  setChecked(true)
-    console.log("radio button change");
-  }
-if(isLoading) return <h3 className="text-light">isLoading</h3>
-if(serverError) return <h3 className="text-light">{serverError || "Unknown Error" }</h3>
+    console.log({trace, checked});
+    dispatch(updateResult({trace, checked}))
+
+    // console.log(questions);
+    // console.log(state);
+  },[checked]);
+
+ 
+  const onSelect = (i) => {
+    onChecked(i)
+    setChecked(i)
+    dispatch(updateResult({trace, checked}))
+
+    // console.log("radio button choosed", i);
+  };
+
+  if (isLoading) return <h3 className="text-light">isLoading</h3>;
+  if (serverError)
+    return <h3 className="text-light">{serverError || "Unknown Error"}</h3>;
   return (
     <div className="questions">
       <h2 className="text-light">{questions?.question}</h2>
 
       <ul key={questions?.id}>
-      { questions?.options.map((q,i) =>(
-        <li key={i}>
-          <input type="radio" value={false} name="options" id={`q${i}-option`} onChange={onSelect}/>
-          <label className="text-primary" htmlFor={`q${i}-option`}>{q}</label>
-          <div className="check"></div>
-        </li>
-      ))}
+        {questions?.options.map((q, i) => (
+          <li key={i}>
+            <input
+              type="radio"
+              value={false}
+              name="options"
+              id={`q${i}-option`}
+              onChange={()=>onSelect(i)}
+            />
+            <label className="text-primary" htmlFor={`q${i}-option`}>
+              {q}
+            </label>
+            <div className={`check ${result[trace]==i ? 'checked': ''}`}></div>
+          </li>
+        ))}
       </ul>
     </div>
   );

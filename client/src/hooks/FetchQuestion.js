@@ -2,7 +2,7 @@
 //Fetch question hook to fetch api data and set value to the store
 
 import { useEffect, useState } from "react"
-import data from "../database/data"
+import data, {answers} from "../database/data"
 import { useDispatch } from "react-redux"
 
 //redux actions
@@ -23,10 +23,10 @@ export const useFetchQuestion =()=>{
       
                       if(question.length > 0){
                           setGetData(prev => ({...prev, isLoading : false}));
-                          setGetData(prev => ({...prev, apiData : question}));
+                          setGetData(prev => ({...prev, apiData : {question, answers}}));
       
                           /** dispatch an action */
-                          dispatch(Action.startExamAction(question))
+                          dispatch(Action.startExamAction({question, answers}))
                       } else{
                           throw new Error("No Question Avalibale");
                       }
@@ -38,6 +38,24 @@ export const useFetchQuestion =()=>{
           }, [dispatch]);
      
   return [getData, setGetData]
+}
+
+//MOve action dispatch function
+export const moveNextQuestion = () => async(dispatch) =>{
+    try {
+        // console.log('okos');
+        dispatch(Action.moveNextAction())
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const movePrevQuestion = () => async(dispatch) =>{
+    try {
+        console.log('okos');
+        dispatch(Action.movePrevAction())
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 
