@@ -8,6 +8,7 @@ import { resetAllAction } from "../redux/questionReducer";
 import { useSelector } from "react-redux";
 import { attempts_Number } from "../helper/helper";
 import { earnPoints_Number, flagResult } from "../helper/helper";
+import { usePublishResult } from "../hooks/setResult";
 //import actions
 
 const Result = () => {
@@ -26,7 +27,9 @@ const Result = () => {
   const attempts = attempts_Number(result);
   const earnPoints = earnPoints_Number(result, answers, 10);
   const flag = flagResult(totalPoints, earnPoints);
-  console.log(earnPoints);
+
+  usePublishResult({result, username:userId, attempts,points:earnPoints,achived: flag?"Passed":"Failed"})
+  // console.log(earnPoints);
   function onRestart() {
     dispatch(resetAllAction());
     dispatch(resetResultAction());
